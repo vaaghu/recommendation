@@ -201,6 +201,14 @@ wrapt = ">=1.10,<2"
 dev = ["tox", "pytest", "pytest-cov", "bump2version (<1)", "sphinx (<2)"]
 
 [[package]]
+name = "distro"
+version = "1.9.0"
+description = "Distro - an OS platform information API"
+category = "main"
+optional = false
+python-versions = ">=3.6"
+
+[[package]]
 name = "exceptiongroup"
 version = "1.2.0"
 description = "Backport of PEP 654 (exception groups)"
@@ -334,6 +342,24 @@ optional = false
 python-versions = ">=3.7"
 
 [[package]]
+name = "httpcore"
+version = "1.0.5"
+description = "A minimal low-level HTTP client."
+category = "main"
+optional = false
+python-versions = ">=3.8"
+
+[package.dependencies]
+certifi = "*"
+h11 = ">=0.13,<0.15"
+
+[package.extras]
+asyncio = ["anyio (>=4.0,<5.0)"]
+http2 = ["h2 (>=3,<5)"]
+socks = ["socksio (>=1.0.0,<2.0.0)"]
+trio = ["trio (>=0.22.0,<0.26.0)"]
+
+[[package]]
 name = "httptools"
 version = "0.6.1"
 description = "A collection of framework independent HTTP protocol utils."
@@ -343,6 +369,27 @@ python-versions = ">=3.8.0"
 
 [package.extras]
 test = ["Cython (>=0.29.24,<0.30.0)"]
+
+[[package]]
+name = "httpx"
+version = "0.27.0"
+description = "The next generation HTTP client."
+category = "main"
+optional = false
+python-versions = ">=3.8"
+
+[package.dependencies]
+anyio = "*"
+certifi = "*"
+httpcore = ">=1.0.0,<2.0.0"
+idna = "*"
+sniffio = "*"
+
+[package.extras]
+brotli = ["brotli", "brotlicffi"]
+cli = ["click (>=8.0.0,<9.0.0)", "pygments (>=2.0.0,<3.0.0)", "rich (>=10,<14)"]
+http2 = ["h2 (>=3,<5)"]
+socks = ["socksio (>=1.0.0,<2.0.0)"]
 
 [[package]]
 name = "huggingface-hub"
@@ -513,6 +560,26 @@ numpy = ">=1.21.6"
 packaging = "*"
 protobuf = "*"
 sympy = "*"
+
+[[package]]
+name = "openai"
+version = "1.14.3"
+description = "The official Python library for the openai API"
+category = "main"
+optional = false
+python-versions = ">=3.7.1"
+
+[package.dependencies]
+anyio = ">=3.5.0,<5"
+distro = ">=1.7.0,<2"
+httpx = ">=0.23.0,<1"
+pydantic = ">=1.9.0,<3"
+sniffio = "*"
+tqdm = ">4"
+typing-extensions = ">=4.7,<5"
+
+[package.extras]
+datalib = ["numpy (>=1)", "pandas-stubs (>=1.1.0.11)", "pandas (>=1.2.3)"]
 
 [[package]]
 name = "opentelemetry-api"
@@ -997,7 +1064,7 @@ zstd = ["zstandard (>=0.18.0)"]
 
 [[package]]
 name = "uvicorn"
-version = "0.28.0"
+version = "0.29.0"
 description = "The lightning-fast ASGI server."
 category = "main"
 optional = false
@@ -1085,7 +1152,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-cov", "pytest-ena
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "b07f318179d9e837c2ff3b2288970b8f47aa4f760cc630e4afab7fe6cf28bfbc"
+content-hash = "df553105f899748fc3283cd951b5a6d64f9875ea39f9f062a8857670a858679f"
 
 [metadata.files]
 annotated-types = []
@@ -1103,6 +1170,7 @@ click = []
 colorama = []
 coloredlogs = []
 deprecated = []
+distro = []
 exceptiongroup = []
 fastapi = []
 filelock = []
@@ -1112,7 +1180,9 @@ google-auth = []
 googleapis-common-protos = []
 grpcio = []
 h11 = []
+httpcore = []
 httptools = []
+httpx = []
 huggingface-hub = []
 humanfriendly = []
 idna = []
@@ -1125,6 +1195,7 @@ mpmath = []
 numpy = []
 oauthlib = []
 onnxruntime = []
+openai = []
 opentelemetry-api = []
 opentelemetry-exporter-otlp-proto-common = []
 opentelemetry-exporter-otlp-proto-grpc = []

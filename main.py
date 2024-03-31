@@ -4,6 +4,18 @@ chroma_client = chromadb.PersistentClient(path="/home/vaaghu/programming/RAG/chr
 collection = chroma_client.get_or_create_collection(
     name="first", metadata={"hnsw:space": "l2"}
 )
+query_collection = chroma_client.get_or_create_collection(
+    name="query_collection", metadata={"hnsw:space": "l2"}
+)
+
+from openai import OpenAI
+from dotenv import load_dotenv
+
+load_dotenv()
+import os
+
+API_KEY = os.getenv("API_KEY")
+client = OpenAI(api_key=API_KEY)
 
 Data = [
     {
@@ -49,17 +61,39 @@ Toradora! is a romantic comedy that follows this odd duo as they embark on a que
 ]
 
 
+def print_similar_quries(queries):
+    print("similar queries: ")
+    for query in queries["metadatas"][0]:
+        print("    " + query["original"])
+
+
 def askChoice() -> int:
     return int(input("Enter your choice: "))
 
 
 def addDoc():
-
     collection.add(
         documents=[data["data"] for data in Data],
         metadatas=[data["meta"] for data in Data],
         ids=[data["id"] for data in Data],
     )
+
+
+def addAnime():
+    try:
+        key = collection.count() + 1
+        for data in Data:
+            embedding_data = client.embeddings.create(
+                input=[data["data"]], model="text-embedding-3-small"
+            ).data
+            print(data["meta"])
+            collection.add(
+                embeddings=[item.embedding for item in embedding_data],
+                metadatas=[data["meta"]],
+                ids=[data["id"]] or key,
+            )
+    except Exception:
+        print(Exception())
 
 
 def query():
@@ -68,16 +102,67 @@ def query():
     print(result)
 
 
+session = []
+
+
+def getQueryEmbedding():
+    question = input("Q: ")
+    question = question.replace("\n", " ")
+    embedding_data = client.embeddings.create(
+        input=[question], model="text-embedding-3-small"
+    ).data
+    queries = query_collection.query(
+        query_embeddings=[item.embedding for item in embedding_data], n_results=10
+    )
+    print("got quries")
+    query_collection.add(
+        embeddings=[item.embedding for item in embedding_data],
+        metadatas=[{"original": question}],
+        ids=[str(query_collection.count() + 1)],
+    )
+    print("added")
+    collection_data = collection.query(
+        query_embeddings=[item.embedding for item in embedding_data], n_results=5
+    )
+    print_similar_quries(queries)
+    print(collection_data)
+    print("Generating Text.....")
+    print("----session----")
+    print(session)
+    print("--------")
+    session.append({"role": "user", "content": question})
+    response = client.chat.completions.create(
+        model="gpt-3.5-turbo-0125",
+        messages=[
+            {
+                "role": "system",
+                "content": f"You are a helpful assistant. with the provided anime data and the general questions asked by the user help him figure out the best anime (recommend anime who's infos are provided) and make your response as readable and fun as possible for him to watch  and the main thing is if the questions aren't directly related to anime keep the response to minimum and if you are unsure of the response to it's correctness with question response with 'you don't have information related to it'     data:{collection_data} general_questions:{queries}",
+            },
+            *session,
+        ],
+    )
+    print(response)
+    print("\nRESPONSE: ")
+    print(response.choices[0].message.content)
+    print("\n")
+    session.append(
+        {"role": "assistant", "content": response.choices[0].message.content}
+    )
+
+
 def Main():
     while True:
         match (askChoice()):
             case 1:
-                addDoc()
+                addAnime()
             case 2:
-                query()
+                getQueryEmbedding()
 
             case 0:
                 return
+            case -1:
+                if bool(input("do you really want to delete you DB: ??")):
+                    print("is DB deleted?: ", chroma_client.reset())
             case _:
                 print("Wrong choice")
 
