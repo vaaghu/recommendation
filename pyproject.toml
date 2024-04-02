@@ -8,8 +8,11 @@ authors = ["vaaghu <vaaghu0@gmail.com>"]
 python = "^3.10"
 chromadb = "^0.4.24"
 openai = "^1.14.3"
+ipykernel = "^6.29.4"
+pandas = "^2.2.1"
 
 [tool.poetry.dev-dependencies]
+ipykernel = "^6.29.4"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

@@ -67,6 +67,12 @@ def print_similar_quries(queries):
         print("    " + query["original"])
 
 
+def print_similar_anime(animes):
+    print("animes: ")
+    for query in animes["metadatas"][0]:
+        print("    " + query["name"])
+
+
 def askChoice() -> int:
     return int(input("Enter your choice: "))
 
@@ -90,7 +96,24 @@ def addAnime():
             collection.add(
                 embeddings=[item.embedding for item in embedding_data],
                 metadatas=[data["meta"]],
-                ids=[data["id"]] or key,
+                ids=[data["id"]] or [[key]],
+            )
+    except Exception:
+        traceback.print_exc()
+
+
+def addAnimeRecord(id, metaData, description):
+    try:
+        key = collection.count() + 1
+        for data in Data:
+            embedding_data = client.embeddings.create(
+                input=[description], model="text-embedding-3-small"
+            ).data
+            print(data["meta"])
+            collection.add(
+                embeddings=[item.embedding for item in embedding_data],
+                metadatas=[{**metaData, "id": id}],
+                ids=[key],
             )
     except Exception:
         print(Exception())
@@ -125,6 +148,7 @@ def getQueryEmbedding():
         query_embeddings=[item.embedding for item in embedding_data], n_results=5
     )
     print_similar_quries(queries)
+    print_similar_anime(collection_data)
     print(collection_data)
     print("Generating Text.....")
     print("----session----")
